@@ -2,6 +2,10 @@ Array.prototype.clone = function() {
   return this.slice(0);
 }
 
+function gtdRock() {
+  // Right now just an empty object
+}
+
 function gtdGrid(width, height) {
   this.width = width;
   this.height = height;
@@ -12,7 +16,7 @@ function gtdGrid(width, height) {
   this.empty() 
 }
 
-// Set or reset the state of the grid to be empty
+// Initialize or re-initialize the grid to be empty.
 gtdGrid.prototype.empty() {
   var grid = [];
   var spaces = [];
@@ -56,7 +60,8 @@ gtdGrid.prototype.getSpaces() {
 // the space above and to the left of (gridX, gridY), assuming a coordinate
 // system with (0, 0) at the top left. In other words, TL is the space with
 // diagonal corners (gridX - 1, gridY - 1) and (gridX, gridY). Spaces outside
-// the bounds of the grid will appear in the returned array as undefined.
+// the bounds of the grid will appear in the returned array as undefined. The
+// returned array is independent of the spaces array.
 gtdGrid.prototype.getAdjacentSpaces(gridX, gridY) {
   var adjSpaces = [];
   
@@ -68,14 +73,32 @@ gtdGrid.prototype.getAdjacentSpaces(gridX, gridY) {
   return adjSpaces;
 }
 
+// Adds a rock at the passed grid location. The rock occupies the spaces adjacent
+// to its location. Returns true if the rock was successfully placed, false
+// otherwise - if another rock was blocking the adjacent spaces, for example.
 gtdGrid.prototype.addRock(gridX, gridY) {
   var blocked = false;
   var adjSpaces = this.getAdjacentSpaces(gridX, gridY);
   
-  for (var i = 0; i < 4; i++) {
+  for (var i = 0; i < adjSpaces.length(); i++) {
     if (adjSpaces[i]) {
       blocked = true;
     }
+  }
+
+  if (!blocked) {
+    grid[gridY][gridX] = new gtdRock();
+
+    // Mark adjacent spaces
+    // TODO change getAdjacentSpaces to return references
+    spaces[gridY - 1][gridX - 1] = true;
+    spaces[gridY - 1][gridX] = true;
+    spaces[gridY][gridX - 1] = true;
+    spaces[gridY][gridX] = true;
+
+    return true;
+  } else {
+    return false;
   }
 }
 
