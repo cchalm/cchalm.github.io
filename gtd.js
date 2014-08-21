@@ -55,6 +55,10 @@ gtdGrid.prototype.getSpaces() {
   return spaces.clone()
 }
 
+gtdGrid.prototype.getAdjacentSpacesRef(gridX, gridY) {
+  
+}
+
 // Returns the spaces adjacent to the passed grid coordinates as a four-element
 // array. The spaces are ordered [TL, TR, BL, BR], where top left (TL) refers to
 // the space above and to the left of (gridX, gridY), assuming a coordinate
