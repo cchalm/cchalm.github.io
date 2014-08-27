@@ -6,6 +6,10 @@ function gtdRock() {
   // Right now just an empty object
 }
 
+function gtdSpace() {
+  this.blocked = false;
+}
+
 function gtdGrid(width, height) {
   this.width = width;
   this.height = height;
@@ -21,54 +25,34 @@ gtdGrid.prototype.empty() {
   var grid = [];
   var spaces = [];
 
-  // Empty rows that we will copy to create each row of the grid and spaces
-  // arrays.
-  var emptyGridRow = [];
-  var emptySpacesRow = [];
-
-  // Use width - 1 because the grid of spaces has one less column than the grid
-  // itself.
-  for (var x = 0; x < this.width - 1; x++) {
-    emptyGridRow.push(null);
-    emptySpacesRow.push(false);
+  for (var y = 0; y < this.height; y++) {
+    grid.push([]);
+    for (var x = 0; x < this.width; x++) {
+      grid[y].push(null);
+    }
   }
-  // Add the final grid column
-  emptyGridRow.push(null);
 
-  // Use height - 1 because the grid of spaces has one less row than the grid
-  // itself.
-  for (var y = 0; x < this.height - 1; x++) {
-    grid.push(emptyGridRow.clone());
-    spaces.push(emptySpacesRow.clone());
+  for (var y = 0; y < this.height - 1; y++) {
+    spaces.push([]);
+    for (var x = 0; x < this.width - 1; x++) {
+      spaces[y].push(new gtdSpace());
+    }
   }
-  // Add the final grid row
-  grid.push(emptyGridRow.clone());
 
   this.grid = grid;
   this.spaces = spaces;
 }
 
-// Returns a two-dimensional array of booleans representing the spaces between
-// gridlines. In the array, falses mean a space is unoccupied, while trues mean
-// a space is occupied. The returned array is independent of this gtdGrid.
-gtdGrid.prototype.getSpaces() {
-  return spaces.clone()
-}
-
-gtdGrid.prototype.getAdjacentSpacesRef(gridX, gridY) {
-  
-}
-
 // Returns the spaces adjacent to the passed grid coordinates as a four-element
-// array. The spaces are ordered [TL, TR, BL, BR], where top left (TL) refers to
-// the space above and to the left of (gridX, gridY), assuming a coordinate
-// system with (0, 0) at the top left. In other words, TL is the space with
-// diagonal corners (gridX - 1, gridY - 1) and (gridX, gridY). Spaces outside
-// the bounds of the grid will appear in the returned array as undefined. The
-// returned array is independent of the spaces array.
+// array. The spaces are ordered [TL, TR, BL, BR], where top left (TL) is the
+// space with diagonal corners (gridX - 1, gridY - 1) and (gridX, gridY). Spaces
+// outside the bounds of the grid will appear in the returned array as undefined.
+// The returned array contains gtdSpace objects that are directly connected to
+// the state of this gtdGrid - modifying them modifies the grid, and if the grid
+// is modified externally these objects will reflect those changes.
 gtdGrid.prototype.getAdjacentSpaces(gridX, gridY) {
   var adjSpaces = [];
-  
+
   adjSpaces.push(spaces[gridY - 1][gridX - 1]);
   adjSpaces.push(spaces[gridY - 1][gridX]);
   adjSpaces.push(spaces[gridY][gridX - 1]);
@@ -85,23 +69,26 @@ gtdGrid.prototype.addRock(gridX, gridY) {
   var adjSpaces = this.getAdjacentSpaces(gridX, gridY);
   
   for (var i = 0; i < adjSpaces.length(); i++) {
-    if (adjSpaces[i]) {
+    if (adjSpaces[i].val) {
       blocked = true;
     }
   }
 
   if (!blocked) {
+    // The spaces around this grid spot are not blocked! Place the rock.
     grid[gridY][gridX] = new gtdRock();
 
-    // Mark adjacent spaces
-    // TODO change getAdjacentSpaces to return references
-    spaces[gridY - 1][gridX - 1] = true;
-    spaces[gridY - 1][gridX] = true;
-    spaces[gridY][gridX - 1] = true;
-    spaces[gridY][gridX] = true;
+    // Block adjacent spaces. Because getAdjacentSpaces() returns reference
+    // types, we can modify the underlying array through them.
+    for (var i = 0; i < adjSpaces.length(); i++) {
+      adjSpaces[i].val = true;
+    }
 
+    // Return true, indicating a rock was successfully added.
     return true;
   } else {
+    // The spaces around this grid position are blocked, we cannot place a rock
+    // here. Return false, indicating a rock could not be added.
     return false;
   }
 }
