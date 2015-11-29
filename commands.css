@@ -1,0 +1,45 @@
+#contents-container > div {
+  float: left;
+  margin: 10px 10px;
+}
+
+#grid div {
+  width: 100%;
+  height: 100%;
+}
+
+#grid td, #grid tr {
+  border: 1px solid black;
+  padding: 0;
+}
+
+#grid {
+  border-collapse: collapse;
+
+  width: 400px;
+  height: 400px;
+}
+
+.block {
+  background-color: black;
+}
+
+.player-north {
+  background-image: url("arrow-N.png");
+  background-size: contain;
+}
+
+.player-east {
+  background-image: url("arrow-E.png");
+  background-size: contain;
+}
+
+.player-south {
+  background-image: url("arrow-S.png");
+  background-size: contain;
+}
+
+.player-west {
+  background-image: url("arrow-W.png");
+  background-size: contain;
+}
