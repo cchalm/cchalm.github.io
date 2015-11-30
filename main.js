@@ -122,11 +122,20 @@ function updateUI(blocked) {
 
   if (blocked) {
     let cell = getGridCell(player.x, player.y);
-    let origColor = cell.style.backgroundColor;
+
+    // TODO this is a hack
+    let properColor;
+    if (target.isAt(player.x, player.y))
+      properColor = "blue";
+    else if (grid.hasBlockAt(player.x, player.y))
+      properColor = "black";
+    else
+      properColor = "white";
+
     cell.style.backgroundColor = "red";
     window.setTimeout(function() {
-      cell.style.backgroundColor = origColor;
-    }, 300);
+      cell.style.backgroundColor = properColor;
+    }, 100);
   }
 }
 

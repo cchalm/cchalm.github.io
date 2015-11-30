@@ -4,7 +4,7 @@
 <head>
   <title>Lynn Camp CS Intro</title>
   <script src="main.js"></script>
-  <link rel="stylesheet" type="text/css" href="commands.css">
+  <link rel="stylesheet" type="text/css" href="index.css">
 </head>
 
 <body>
@@ -19,9 +19,13 @@
 
     <div id="statements-container">
       <button id="run-btn">Run</button>
+      <div>
+        <span id="speed-label">Speed:</span>
+        <input id="speed-input" type="range" />
+      </div>
       <div id="errors"></div>
       <div>
-        <textarea id = "commandInput" rows="24"></textarea>
+        <textarea id = "commandInput" rows="22"></textarea>
       </div>
     </div>
 
@@ -29,7 +33,7 @@
       step  - step forward</br>
       left  - turn left</br>
       right - turn right</br>
-      loop x times - perform the steps between this command and "endloop"
+      loop x times - perform the commands between this one and "endloop"
                      x times</br>
       endloop - must be paired with a loop
     </div>

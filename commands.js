@@ -36,7 +36,9 @@ function runHelper(cmds, execState) {
   let cmd = cmds[execState.index];
 
   let blocked = false;
-  let delay = 500;
+  let speed = parseInt(document.getElementById("speed-input").value);
+  let maxDelay = 1000;
+  let delay = maxDelay - (speed * maxDelay / 100);
 
   switch (cmd.name) {
 
