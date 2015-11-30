@@ -74,10 +74,6 @@ let target = {
   },
 
   isAt: function(x, y) {
-    console.log(x);
-    console.log(y);
-    console.log(this.x);
-    console.log(this.y);
     return x === this.x && y === this.y;
   }
 };

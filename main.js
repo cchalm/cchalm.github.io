@@ -115,7 +115,6 @@ function updateUI(blocked) {
       } 
 
       if (target.isAt(x, y)) {
-        console.log("msg" + x + y);
         cell.className += " target";
       }
     }
