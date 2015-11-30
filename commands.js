@@ -3,44 +3,15 @@
 let commands = Object.freeze({
   STEP: "step",
   LEFT: "left",
-  RIGHT: "right"
+  RIGHT: "right",
+  LOOP: "loop",
+  ENDLOOP: "endloop"
 });
-
-let orientals = Object.freeze({
-  NORTH: "north",
-  EAST: "east",
-  SOUTH: "south",
-  WEST: "west"
-});
-
-let player = {
-  x: 4,
-  y: 4,
-  oriental: orientals.NORTH,
-
-  isAt: function(x, y) {
-    return x === this.x && y === this.y;
-  }
-};
-
-let grid = {};
-
-window.onload = function() {
-  let thisScript = document.getElementsByTagName("script")[0];
-  thisScript.parentNode.removeChild(thisScript);
-
-  initGrid(9, 9);
-
-  grid.addBlockAt(5, 5);
-
-  document.getElementById("run-btn").onclick = run;
-
-  show();
-}
 
 function run() {
   let cmds;
   
+  document.getElementById("errors").innerText = "";
   try {
     cmds = parseCommands(document.getElementById("commandInput").value);
   } catch (e) {
@@ -48,16 +19,27 @@ function run() {
     return;
   }
 
+  if (cmds.length === 0)
+    return;
+
   document.getElementById("run-btn").disabled = true;
 
-  runHelper(cmds);
+  let execState = {
+    index: 0,
+    loopItersStack: [],
+    loopIndexStack: []
+  };
+  runHelper(cmds, execState);
 }
 
-function runHelper(cmds) {
-  let cmd = cmds.shift();
-  console.log(cmd);
+function runHelper(cmds, execState) {
+  let cmd = cmds[execState.index];
 
-  switch (cmd) {
+  let blocked = false;
+  let delay = 500;
+
+  switch (cmd.name) {
+
     case commands.STEP:
       let newPos = { x: player.x, y: player.y };
 
@@ -80,9 +62,12 @@ function runHelper(cmds) {
           && !grid.hasBlockAt(newPos.x, newPos.y)) {
         player.x = newPos.x;
         player.y = newPos.y;
+      } else {
+        blocked = true;
       }
 
       break;
+
     case commands.RIGHT:
       switch (player.oriental) {
         case orientals.NORTH:
@@ -99,8 +84,8 @@ function runHelper(cmds) {
           break;
       }        
       break;
-    case commands.LEFT:
 
+    case commands.LEFT:
       switch (player.oriental) {
         case orientals.NORTH:
           player.oriental = orientals.WEST;
@@ -114,140 +99,126 @@ function runHelper(cmds) {
         case orientals.WEST:
           player.oriental = orientals.SOUTH;
           break;
-      }        
+      } 
 
       break;
+
+    case commands.LOOP:
+      assert(cmd.times > 0);
+
+      delay = 0;
+
+      execState.loopItersStack.push(cmd.times);
+      execState.loopIndexStack.push(execState.index);
+      break;
+    case commands.ENDLOOP:
+      let indexStack = execState.loopIndexStack;
+      let itersStack = execState.loopItersStack;
+      assert(indexStack.length > 0
+             && indexStack.length === itersStack.length);
+
+      delay = 0;
+
+      let numItersLeft = itersStack.pop() - 1;
+      if (numItersLeft > 0) {
+        itersStack.push(numItersLeft);
+        execState.index = indexStack[indexStack.length - 1];
+      } else {
+        indexStack.pop();
+      }
+      break;
+  
   }
 
-  show();
+  show(blocked);
 
-  if (cmds.length === 0) {
+  execState.index++;
+  if (execState.index >= cmds.length) {
     document.getElementById("run-btn").disabled = false;
     return;
   }
 
-  window.setTimeout(runHelper(cmds), 700);
+  window.setTimeout(runHelper, delay, cmds, execState);
 }
 
 function parseCommands(inputText) {
   let cmds = [];
   let errs = [];
 
+  let loopStackLen = 0;
+
   let lines = inputText.split('\n'); 
   for (let line of lines) {
-    line = line.replace(/\s/g, "");
-
     if (line.length === 0)
       continue;
 
-    switch (line.toLowerCase()) {
+    line = line.trim().toLowerCase();
+
+    let args = line.split(/\s+/g);
+    let cmdName = args.shift();
+
+    switch (cmdName) {
+      case commands.ENDLOOP:
+        if (loopStackLen === 0) {
+          errs.push(line);
+        } else {
+          loopStackLen--;
+        }
+        // Intentionally no break
       case commands.STEP:
-        cmds.push(commands.STEP);
-        break;
       case commands.LEFT:
-        cmds.push(commands.LEFT);
-        break;
       case commands.RIGHT:
-        cmds.push(commands.RIGHT);
+        if (args.length !== 0) {
+          errs.push(line);
+          break;
+        }
+
+        cmds.push({ name: cmdName });
+        break;
+      case commands.LOOP:
+        loopStackLen++;
+
+        if (args.length !== 2 || args[1] !== "times") {
+          errs.push(line);
+          break;
+        }
+
+        let times;
+        try {
+          times = parseInt(args[0]);
+        } catch (e) {
+          errs.push(line);
+          break;
+        }
+
+        if (times < 1)
+          errs.push(line);
+
+        cmds.push({ name: cmdName, times: times }); 
         break;
       default:
         errs.push(line);
     }
   }
 
-  if (errs.length !== 0) {
-    let errStr = "Invalid command(s):";
-    for (let err of errs) {
-      errStr += " " + err;
-    }
+  let errStr = ""
 
+  if (errs.length !== 0) {
+    errStr += "Invalid line(s):";
+    for (let err of errs) {
+      errStr += "\n  " + err;
+    }
+  }
+
+  if (loopStackLen > 0) {
+    if (errStr.length !== 0)
+      errStr += "\n";
+    errStr += "Loop tags without endloops: " + loopStackLen;
+  }
+
+  if (errStr.length !== 0) {
     throw errStr;
   }
 
   return cmds;
-}
-
-function initGrid(width, height) {
-  grid.width = width;
-  grid.height = height;
-  // Maps x-coordinates to sets of y-coordinates
-  grid.blocks = {};
-
-  grid.hasBlockAt = function(x, y) {
-    return hasKey(this.blocks, x) && this.blocks[x].has(y);
-  };
-
-  grid.addBlockAt = function(x, y) {
-    assert(this.contains(x, y), "Coordinates out of bounds");
-
-    if (!hasKey(this.blocks, x))
-      this.blocks[x] = new Set();
-
-    let ys = this.blocks[x];
-
-    if (!ys.has(y))
-      ys.add(y);
-  }
-
-  grid.removeBlockAt = function(x, y) {
-    assert(this.contains(x, y), "Coordinates out of bounds");
-
-    if (this.hasBlockAt(x, y)) {
-      this.blocks[x].delete(y);
-      if (this.blocks[x].size === 0)
-        delete this.blocks[x];
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  grid.contains = function(x, y) {
-    return x >= 0 && x < this.width && y >= 0 && y < this.height;
-  }
-}
-
-function show() {
-  let table = document.getElementById("grid");
-  table.innerHTML = "";
-
-  let row = document.createElement("tr");
-  let col = document.createElement("td");
-
-  let div = document.createElement("div");
-  col.appendChild(div);
-
-  for (let rowNum = 0; rowNum < grid.height; rowNum++) {
-    let row = document.createElement("tr");
-
-    for (let colNum = 0; colNum < grid.width; colNum++) {
-      let col = document.createElement("td");
-
-      col.id = "" + colNum + "," + rowNum;
-      col.className = "grid-square";
-
-      if (grid.hasBlockAt(colNum, rowNum)) {
-        col.className += " block";
-      }
-
-      if (player.isAt(colNum, rowNum)) {
-        col.className += " player-" + player.oriental;
-      }
-
-      row.appendChild(col);
-    }
-
-    table.appendChild(row);
-  }
-}
-
-function hasKey(dict, key) {
-  return Object.prototype.hasOwnProperty.call(dict, key);  
-}
-
-function assert(condition, message) {
-  if (!condition) {
-    message = message || "Assertion failed";
-    throw new Error(message);
-  }
 }

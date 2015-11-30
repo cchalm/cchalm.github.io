@@ -3,7 +3,7 @@
 
 <head>
   <title>Lynn Camp CS Intro</title>
-  <script src="commands.js"></script>
+  <script src="main.js"></script>
   <link rel="stylesheet" type="text/css" href="commands.css">
 </head>
 
@@ -21,8 +21,17 @@
       <button id="run-btn">Run</button>
       <div id="errors"></div>
       <div>
-        <textarea id = "commandInput" rows="25"></textarea>
+        <textarea id = "commandInput" rows="24"></textarea>
       </div>
+    </div>
+
+    <div id="commands">
+      step  - step forward</br>
+      left  - turn left</br>
+      right - turn right</br>
+      loop x times - perform the steps between this command and "endloop"
+                     x times</br>
+      endloop - must be paired with a loop
     </div>
   </div>
 
