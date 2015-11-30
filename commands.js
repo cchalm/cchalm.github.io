@@ -130,7 +130,7 @@ function runHelper(cmds, execState) {
   
   }
 
-  show(blocked);
+  updateUI(blocked);
 
   execState.index++;
   if (execState.index >= cmds.length) {

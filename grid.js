@@ -40,6 +40,18 @@ let grid = {
 
   contains: function(x, y) {
     return x >= 0 && x < this.width && y >= 0 && y < this.height;
+  },
+
+  getBlocks: function() {
+    let blocks = [];
+
+    for (key in blocks) {
+      for (val of blocks[key]) {
+        blocks.push({ x: key, y: val });
+      }
+    }
+
+    return blocks;
   }
 };
 
@@ -59,6 +71,14 @@ let target = {
       this.x = x;
       this.y = y;
     }
+  },
+
+  isAt: function(x, y) {
+    console.log(x);
+    console.log(y);
+    console.log(this.x);
+    console.log(this.y);
+    return x === this.x && y === this.y;
   }
 };
 

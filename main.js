@@ -24,18 +24,56 @@ window.onload = function() {
     return loadScript("commands.js");
   }).then(function() {
     initGrid(9, 9);
-    grid.addBlockAt(5, 5);
 
-    target.setPos(7, 8);
+    target.x = -1;
+    target.y = -1;
     player.setPos(4, 4);
+
+    initUI();
 
     document.getElementById("run-btn").onclick = run;
 
-    show();
-  })
+    let addingBlocks = false;
+    let mouseDown = false;
+
+    for (let y = 0; y < grid.height; y++) {
+      for (let x = 0; x < grid.width; x++) {
+
+        let elem = document.getElementById("" + x + "," + y);
+
+        elem.onmousedown = function() {
+          if (grid.hasBlockAt(x, y)) {
+            grid.removeBlockAt(x, y);
+            addingBlocks = false;
+          } else {
+            grid.addBlockAt(x, y);
+            addingBlocks = true;
+          }
+
+          mouseDown = true;
+          updateUI(false);
+        }
+/*
+        elem.onmousemove = function() {
+          if (mouseDown && (addingBlocks !== grid.hasBlockAt(x, y))) {
+            if (addingBlocks)
+              grid.addBlockAt(x, y);
+            else
+              grid.removeBlockAt(x, y);
+            updateUI(false);
+          }
+        }
+*/
+        document.body.onmouseup = function() {
+          mouseDown = false;
+        }
+
+      }
+    }
+  });
 }
 
-function show(blocked) {
+function initUI() {
   let table = document.getElementById("grid");
   table.innerHTML = "";
 
@@ -52,19 +90,6 @@ function show(blocked) {
       let col = document.createElement("td");
 
       col.id = "" + colNum + "," + rowNum;
-      col.className = "grid-square";
-
-      if (grid.hasBlockAt(colNum, rowNum)) {
-        col.className += " block";
-      }
-
-      if (target.x === colNum && target.y === rowNum) {
-        col.className += " target";
-      }
-
-      if (player.isAt(colNum, rowNum)) {
-        col.className += " player-" + player.oriental;
-      }
 
       row.appendChild(col);
     }
@@ -72,17 +97,41 @@ function show(blocked) {
     table.appendChild(row);
   }
 
+  updateUI(false);
+}
+
+function updateUI(blocked) {
+  for (let x = 0; x < grid.width; x++) {
+    for (let y = 0; y < grid.height; y++) {
+      let cell = getGridCell(x, y);
+      cell.className = "grid-cell";
+
+      if (grid.hasBlockAt(x, y)) {
+        cell.className += " block";
+      }
+
+      if (player.isAt(x, y)) {
+        cell.className += " player-" + player.oriental;
+      } 
+
+      if (target.isAt(x, y)) {
+        console.log("msg" + x + y);
+        cell.className += " target";
+      }
+    }
+  }
+
   if (blocked) {
-    let square = getGridSquare(player.x, player.y);
-    let origColor = square.style.backgroundColor;
-    square.style.backgroundColor = "red";
+    let cell = getGridCell(player.x, player.y);
+    let origColor = cell.style.backgroundColor;
+    cell.style.backgroundColor = "red";
     window.setTimeout(function() {
-      square.style.backgroundColor = origColor;
+      cell.style.backgroundColor = origColor;
     }, 300);
   }
 }
 
-function getGridSquare(x, y) {
+function getGridCell(x, y) {
   return document.getElementById("" + x + "," + y);
 }
 
