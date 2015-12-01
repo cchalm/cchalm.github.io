@@ -39,7 +39,7 @@ window.onload = function() {
         player.setPos(4, 4);
         player.oriental = orientals.NORTH;
         updateUI();
-      }, 100);
+      }, 300);
     };
     document.getElementById("run-btn").onclick = run;
 
