@@ -31,6 +31,11 @@ window.onload = function() {
 
     initUI();
 
+    document.getElementById("reset-btn").onclick = function() {
+      player.setPos(4, 4);
+      player.oriental = orientals.NORTH;
+      updateUI();
+    };
     document.getElementById("run-btn").onclick = run;
 
     let addingBlocks = false;
