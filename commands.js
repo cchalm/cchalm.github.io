@@ -151,10 +151,10 @@ function parseCommands(inputText) {
 
   let lines = inputText.split('\n'); 
   for (let line of lines) {
+    line = line.trim().toLowerCase();
+
     if (line.length === 0)
       continue;
-
-    line = line.trim().toLowerCase();
 
     let args = line.split(/\s+/g);
     let cmdName = args.shift();
