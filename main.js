@@ -52,6 +52,9 @@ window.onload = function() {
         let elem = document.getElementById("" + x + "," + y);
 
         elem.onmousedown = function() {
+          if (player.isAt(x, y))
+            return;
+
           if (grid.hasBlockAt(x, y)) {
             grid.removeBlockAt(x, y);
             addingBlocks = false;
