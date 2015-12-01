@@ -8,6 +8,8 @@ let commands = Object.freeze({
   ENDLOOP: "endloop"
 });
 
+let reset = false;
+
 function run() {
   let cmds;
   
@@ -135,7 +137,7 @@ function runHelper(cmds, execState) {
   updateUI(blocked);
 
   execState.index++;
-  if (execState.index >= cmds.length) {
+  if (execState.index >= cmds.length || reset) {
     document.getElementById("run-btn").disabled = false;
     return;
   }

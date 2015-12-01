@@ -32,9 +32,14 @@ window.onload = function() {
     initUI();
 
     document.getElementById("reset-btn").onclick = function() {
-      player.setPos(4, 4);
-      player.oriental = orientals.NORTH;
-      updateUI();
+      // TODO complete hack
+      reset = true;
+      window.setTimeout(function() {
+        reset = false;
+        player.setPos(4, 4);
+        player.oriental = orientals.NORTH;
+        updateUI();
+      }, 100);
     };
     document.getElementById("run-btn").onclick = run;
 
