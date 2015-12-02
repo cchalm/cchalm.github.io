@@ -36,7 +36,7 @@ window.onload = function() {
       reset = true;
       window.setTimeout(function() {
         reset = false;
-        player.setPos(4, 4);
+        player.setPos(0, 8);
         player.oriental = orientals.NORTH;
         updateUI();
       }, 300);
