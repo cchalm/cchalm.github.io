@@ -28,6 +28,10 @@
   background-color: black;
 }
 
+.blocked {
+  background-color: red;
+}
+
 .player-north {
   background-image: url("arrow-N.png");
   background-size: contain;

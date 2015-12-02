@@ -136,18 +136,10 @@ function updateUI(blocked) {
   if (blocked) {
     let cell = getGridCell(player.x, player.y);
 
-    // TODO this is a hack
-    let properColor;
-    if (target.isAt(player.x, player.y))
-      properColor = "blue";
-    else if (grid.hasBlockAt(player.x, player.y))
-      properColor = "black";
-    else
-      properColor = "white";
-
-    cell.style.backgroundColor = "red";
+    cell.className += " blocked";
     window.setTimeout(function() {
-      cell.style.backgroundColor = properColor;
+      // Remove "blocked" from class name
+      cell.className = cell.className.replace(" blocked", "");
     }, 100);
   }
 }
