@@ -27,7 +27,7 @@ window.onload = function() {
 
     target.x = -1;
     target.y = -1;
-    player.setPos(4, 4);
+    player.setPos(0, 8);
 
     initUI();
 
