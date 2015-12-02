@@ -161,6 +161,14 @@ function parseCommands(inputText) {
     let args = line.split(/\s+/g);
     let cmdName = args.shift();
 
+    if (cmdName === "level2"
+        || cmdName === "leveltwo"
+        || (cmdName === "level" && args.length === 1
+           && (args[0] === "2" || args[0] === "two"))) {
+      window.location.href = "./level2/index.html";
+      return;
+    }
+
     switch (cmdName) {
       case commands.ENDLOOP:
         if (loopStackLen === 0) {

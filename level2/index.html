@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Lynn Camp CS Java</title>
+  <script src="main.js"></script>
+  <link rel="stylesheet" type="text/css" href="level2.css">
+  <meta charset=
+</head>
+
+<body>
+  <h1>Java</h1>
+  <p>
+  Online compiler:
+  <a href="https://www.compilejava.net/">
+    https://www.compilejava.net/
+  </a>
+  </p>
+
+  <h3>The Basics</h3>
+  <p>
+  Every Java program needs to have a public class with a method called
+  "main". Here is a very simple Java program that prints the string "Hello,   world!".     
+  <pre><code>public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}</code></pre>
+  <p>
+  Take note of the main method. It has to be defined exactly like this:
+  <code>public static void main(String[] args)</code>.
+  </p>
+
+  <h3>Methods</h3>
+  <p>
+  "main" is a method; you can define your own methods too. Here is an
+  example of a method called "printWeirdThing" being called twice in main.
+  </p>
+  <pre><code>public class HelloWorld {
+    public static void main(String[] args) {
+      printWildcats();
+      printWildcats();
+    }
+
+    public static void printWildcats() {
+        System.out.println("Dem cats be wild");
+    }
+}</code></pre>
+
+</body>
+
+</html>
