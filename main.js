@@ -29,7 +29,7 @@ window.onload = function() {
     target.y = -1;
     player.setPos(0, 8);
 
-    initUI();
+    initGridUI();
 
     document.getElementById("reset-btn").onclick = function() {
       // TODO complete hack
@@ -38,7 +38,7 @@ window.onload = function() {
         reset = false;
         player.setPos(0, 8);
         player.oriental = orientals.NORTH;
-        updateUI();
+        updateGridUI();
       }, 300);
     };
     document.getElementById("run-btn").onclick = run;
@@ -64,7 +64,7 @@ window.onload = function() {
           }
 
           mouseDown = true;
-          updateUI(false);
+          updateGridUI();
         }
 /*
         elem.onmousemove = function() {
@@ -73,7 +73,7 @@ window.onload = function() {
               grid.addBlockAt(x, y);
             else
               grid.removeBlockAt(x, y);
-            updateUI(false);
+            updateGridUI();
           }
         }
 */
@@ -86,7 +86,7 @@ window.onload = function() {
   });
 }
 
-function initUI() {
+function initGridUI() {
   let table = document.getElementById("grid");
   table.innerHTML = "";
 
@@ -110,10 +110,12 @@ function initUI() {
     table.appendChild(row);
   }
 
-  updateUI(false);
+  updateGridUI();
 }
 
-function updateUI(blocked) {
+function updateGridUI(blocked) {
+  blocked = typeof blocked === "undefined" ? false : blocked;
+
   for (let x = 0; x < grid.width; x++) {
     for (let y = 0; y < grid.height; y++) {
       let cell = getGridCell(x, y);
@@ -142,6 +144,77 @@ function updateUI(blocked) {
       cell.className = cell.className.replace(" blocked", "");
     }, 100);
   }
+}
+
+function initCmdUI(execState) {
+  let input = document.getElementById("command-input");
+  input.style.display = "none";
+
+  let viz = document.getElementById("command-viz");
+
+  let indent = 0;
+  for (let i = 0; i < execState.cmds.length; i++) {
+    let cmd = execState.cmds[i];
+
+    if (cmd.name === commands.ENDLOOP) {
+      indent--;
+    }
+
+    let cmdDiv = document.createElement("div");
+    cmdDiv.id = "index" + i;
+    cmdDiv.className = "command";
+    cmdDiv.innerText = "";
+    for (let j = 0; j < indent*2; j++) {
+      cmdDiv.innerText += "\xA0";
+    }
+    cmdDiv.innerText += cmd.name;
+
+    if (cmd.name === commands.LOOP) {
+      cmdDiv.innerText += " " + cmd.times + " times";
+    }
+
+    viz.appendChild(cmdDiv);
+
+    if (cmd.name === commands.LOOP) {
+      indent++;
+    }
+  }
+
+  updateCmdUI(execState);
+}
+
+function updateCmdUI(execState) {
+  let activeCmdDiv = document.getElementById("index" + execState.index);
+  activeCmdDiv.className += " active";
+/*
+  let indexStack = execState.loopIndexStack;
+  let stackTop = indexStack.length - 1;
+
+  if (stackTop >= 0) {
+    let itersStack = execState.loopItersStack;
+
+    let index = indexStack[stackTop];
+    let iters = itersStack[stackTop];
+
+    let loopDiv = document.getElementById("index" + index);
+
+    loopDiv.innerText = loopDiv.innerText.replace(/[0-9]+/g, iters);
+  }
+*/
+  if (typeof updateCmdUI.lastActiveDiv !== "undefined") {
+    updateCmdUI.lastActiveDiv.className =
+        updateCmdUI.lastActiveDiv.className.replace(" active", "");
+  }
+
+  updateCmdUI.lastActiveDiv = activeCmdDiv;
+}
+
+function teardownCmdUI() {
+  let input = document.getElementById("command-input");
+  input.style.display = "";
+
+  let viz = document.getElementById("command-viz");
+  viz.innerHTML = "";
 }
 
 function getGridCell(x, y) {

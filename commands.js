@@ -12,10 +12,10 @@ let reset = false;
 
 function run() {
   let cmds;
-  
+
   document.getElementById("errors").innerText = "";
   try {
-    cmds = parseCommands(document.getElementById("commandInput").value);
+    cmds = parseCommands(document.getElementById("command-input").value);
   } catch (e) {
     document.getElementById("errors").innerText = e;
     return;
@@ -28,19 +28,25 @@ function run() {
 
   let execState = {
     index: 0,
+    cmds: cmds,
     loopItersStack: [],
     loopIndexStack: []
   };
-  runHelper(cmds, execState);
+
+  initCmdUI(execState);
+
+  runHelper(execState);
 }
 
-function runHelper(cmds, execState) {
-  let cmd = cmds[execState.index];
+function runHelper(execState) {
+  let cmd = execState.cmds[execState.index];
 
   let blocked = false;
   let speed = parseInt(document.getElementById("speed-input").value);
   let maxDelay = 1000;
   let delay = maxDelay - (speed * maxDelay / 100);
+
+  let isMovementCmd = true;
 
   switch (cmd.name) {
 
@@ -114,6 +120,9 @@ function runHelper(cmds, execState) {
 
       execState.loopItersStack.push(cmd.times);
       execState.loopIndexStack.push(execState.index);
+
+      isMovementCmd = false;
+
       break;
     case commands.ENDLOOP:
       let indexStack = execState.loopIndexStack;
@@ -130,19 +139,26 @@ function runHelper(cmds, execState) {
       } else {
         indexStack.pop();
       }
+
+      isMovementCmd = false;
+
       break;
   
   }
 
-  updateUI(blocked);
+  if (isMovementCmd) {
+    updateGridUI(blocked);
+    updateCmdUI(execState);
+  }
 
   execState.index++;
-  if (execState.index >= cmds.length || reset) {
+  if (execState.index >= execState.cmds.length || reset) {
     document.getElementById("run-btn").disabled = false;
+    teardownCmdUI();
     return;
   }
 
-  window.setTimeout(runHelper, delay, cmds, execState);
+  window.setTimeout(runHelper, delay, execState);
 }
 
 function parseCommands(inputText) {

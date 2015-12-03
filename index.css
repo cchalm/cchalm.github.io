@@ -3,6 +3,10 @@
   margin: 10px 10px;
 }
 
+#command-info {
+  clear: left;
+}
+
 #grid div {
   width: 100%;
   height: 100%;
@@ -72,3 +76,11 @@ button {
   margin-left: 50px;
 }
 
+#command-viz {
+  font-family: monospace;
+  font-size: 10pt;
+}
+
+.active {
+  background-color: lightblue;
+}
