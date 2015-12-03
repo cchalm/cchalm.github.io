@@ -9,6 +9,7 @@ let commands = Object.freeze({
 });
 
 let reset = false;
+let running = false;
 
 function run() {
   let cmds;
@@ -32,6 +33,8 @@ function run() {
     loopItersStack: [],
     loopIndexStack: []
   };
+
+  running = true;
 
   initCmdUI(execState);
 
@@ -153,6 +156,7 @@ function runHelper(execState) {
 
   execState.index++;
   if (execState.index >= execState.cmds.length || reset) {
+    running = false;
     document.getElementById("run-btn").disabled = false;
     teardownCmdUI();
     return;

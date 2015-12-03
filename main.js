@@ -31,15 +31,23 @@ window.onload = function() {
 
     initGridUI();
 
-    document.getElementById("reset-btn").onclick = function() {
-      // TODO complete hack
+    let resetBtn = document.getElementById("reset-btn");
+    resetBtn.onclick = function() {
+      // TODO using global flags is pretty hacky
+      resetBtn.disabled = true;
       reset = true;
-      window.setTimeout(function() {
-        reset = false;
-        player.setPos(0, 8);
-        player.oriental = orientals.NORTH;
-        updateGridUI();
-      }, 300);
+      let checkFn = function() {
+        if (running === false) {
+          reset = false;
+          player.setPos(0, 8);
+          player.oriental = orientals.NORTH;
+          updateGridUI();
+          resetBtn.disabled = false;
+        } else {
+          window.setTimeout(checkFn, 100);
+        }
+      }
+      checkFn();
     };
     document.getElementById("run-btn").onclick = run;
 
